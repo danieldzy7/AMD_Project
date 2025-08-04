@@ -23,4 +23,4 @@ services:
     staticPublishPath: ./client/build
     envVars:
       - key: REACT_APP_API_URL
-        value: https://amd-ppm-backend.onrender.com 
+        value: https://amd-project.onrender.com 
