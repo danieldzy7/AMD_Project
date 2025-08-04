@@ -23,4 +23,12 @@ services:
     staticPublishPath: ./client/build
     envVars:
       - key: REACT_APP_API_URL
-        value: https://amd-project.onrender.com 
+        value: https://amd-project.onrender.com
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: no-cache
+    redirects:
+      - source: /*
+        destination: /index.html
+        type: rewrite 
