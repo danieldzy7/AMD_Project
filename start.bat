@@ -27,7 +27,7 @@ if %errorlevel% neq 0 (
 )
 
 echo 📦 Installing backend dependencies...
-cd backend
+cd server
 call npm install
 if %errorlevel% neq 0 (
     echo ❌ Failed to install backend dependencies
@@ -37,7 +37,7 @@ if %errorlevel% neq 0 (
 cd ..
 
 echo 📦 Installing frontend dependencies...
-cd frontend
+cd client
 call npm install
 if %errorlevel% neq 0 (
     echo ❌ Failed to install frontend dependencies

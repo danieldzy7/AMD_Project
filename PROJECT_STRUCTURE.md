@@ -7,8 +7,8 @@ This document provides a detailed overview of the AMD PPM Dashboard project stru
 
 ```
 AMD_Project/
-├── frontend/                 # React frontend application
-├── backend/                  # Node.js backend application
+├── client/                  # React frontend application
+├── server/                  # Node.js backend application
 ├── start.bat                # Windows startup script
 ├── package.json             # Root project configuration
 ├── .gitignore              # Git ignore rules
@@ -16,10 +16,10 @@ AMD_Project/
 └── PROJECT_STRUCTURE.md    # This file
 ```
 
-## Frontend Structure (`frontend/`)
+## Frontend Structure (`client/`)
 
 ```
-frontend/
+client/
 ├── public/                  # Static assets
 │   ├── index.html          # Main HTML template
 │   ├── favicon.ico         # Application icon
@@ -57,10 +57,10 @@ frontend/
 - **Responsive Design**: Mobile-friendly interface using Tailwind CSS
 - **Real-time Updates**: Live data synchronization with backend
 
-## Backend Structure (`backend/`)
+## Backend Structure (`server/`)
 
 ```
-backend/
+server/
 ├── models/                 # Database models
 │   └── Project.js         # Project data model
 ├── routes/                # API routes
