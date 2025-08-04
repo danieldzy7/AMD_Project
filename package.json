@@ -1,0 +1,44 @@
+{
+  "name": "amd-ppm-dashboard",
+  "version": "1.0.0",
+  "description": "AMD Project Portfolio Management Dashboard - A modern web application for managing and monitoring R&D projects",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd backend && npm run dev",
+    "client": "cd frontend && npm start",
+    "install-all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "build": "cd frontend && npm run build",
+    "start": "cd backend && npm start",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "keywords": [
+    "amd",
+    "ppm",
+    "dashboard",
+    "mern",
+    "react",
+    "nodejs",
+    "mongodb",
+    "project-management"
+  ],
+  "author": "AMD Development Team",
+  "license": "Proprietary",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/amd/ppm-dashboard.git"
+  },
+  "bugs": {
+    "url": "https://github.com/amd/ppm-dashboard/issues"
+  },
+  "homepage": "https://github.com/amd/ppm-dashboard#readme"
+} 
