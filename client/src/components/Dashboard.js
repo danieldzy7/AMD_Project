@@ -13,7 +13,7 @@ import {
   Target,
   BarChart3
 } from 'lucide-react';
-import axios from 'axios';
+import api from '../config/axios';
 import { AgCharts } from 'ag-charts-react';
 
 const Dashboard = () => {
@@ -36,7 +36,7 @@ const Dashboard = () => {
 
   const fetchDashboardStats = async () => {
     try {
-      const response = await axios.get('/api/projects/stats/dashboard');
+      const response = await api.get('/api/projects/stats/dashboard');
       setStats(response.data);
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error);
@@ -61,7 +61,7 @@ const Dashboard = () => {
   const seedSampleData = async () => {
     if (window.confirm('Add 50 sample AMD projects to the database?')) {
       try {
-        await axios.post('/api/projects/seed');
+        await api.post('/api/projects/seed');
         alert('Sample data has been added successfully');
         fetchDashboardStats(); // Refresh the dashboard
       } catch (error) {

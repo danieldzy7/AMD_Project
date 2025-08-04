@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, CheckCircle, AlertCircle, Play, Pause, BarChart3, TrendingUp, Activity, Target, ChevronLeft, ChevronRight } from 'lucide-react';
-import axios from 'axios';
+import api from '../config/axios';
 import { format, addDays, differenceInDays, startOfMonth, endOfMonth } from 'date-fns';
 
 const Timeline = () => {
@@ -16,7 +16,7 @@ const Timeline = () => {
 
   const fetchProjects = async () => {
     try {
-      const response = await axios.get('/api/projects');
+      const response = await api.get('/api/projects');
       setProjects(response.data);
     } catch (error) {
       console.error('Failed to fetch project data:', error);

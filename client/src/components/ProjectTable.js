@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { AgGridReact } from 'ag-grid-react';
 import { Plus, Edit, Trash2, Download, Filter, X } from 'lucide-react';
-import axios from 'axios';
+import api from '../config/axios';
 import { format } from 'date-fns';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
@@ -36,7 +36,7 @@ const ProjectTable = () => {
 
   const fetchProjects = async () => {
     try {
-      const response = await axios.get('/api/projects');
+      const response = await api.get('/api/projects');
       setProjects(response.data);
     } catch (error) {
       console.error('Failed to fetch project data:', error);
@@ -48,7 +48,7 @@ const ProjectTable = () => {
   const handleDelete = async (projectId) => {
     if (window.confirm('Are you sure you want to delete this project?')) {
       try {
-        await axios.delete(`/api/projects/${projectId}`);
+        await api.delete(`/api/projects/${projectId}`);
         fetchProjects();
       } catch (error) {
         console.error('Failed to delete project:', error);
@@ -67,7 +67,7 @@ const ProjectTable = () => {
         taxCreditEligible: Math.round(taxCreditEligible)
       };
       
-      await axios.post('/api/projects', projectData);
+      await api.post('/api/projects', projectData);
       setShowNewProjectModal(false);
       setNewProject({
         projectId: '',

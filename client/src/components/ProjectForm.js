@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { Save, ArrowLeft, Plus } from 'lucide-react';
-import axios from 'axios';
+import api from '../config/axios';
 
 const ProjectForm = () => {
   const { id } = useParams();
@@ -46,7 +46,7 @@ const ProjectForm = () => {
 
   const fetchProject = async () => {
     try {
-      const response = await axios.get(`/api/projects/${id}`);
+      const response = await api.get(`/api/projects/${id}`);
       const projectData = response.data;
       setProject(projectData);
     } catch (error) {
@@ -67,9 +67,9 @@ const ProjectForm = () => {
       };
 
       if (isEditing) {
-        await axios.put(`/api/projects/${id}`, projectData);
+        await api.put(`/api/projects/${id}`, projectData);
       } else {
-        await axios.post('/api/projects', projectData);
+        await api.post('/api/projects', projectData);
       }
       
       navigate('/projects');

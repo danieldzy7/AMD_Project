@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Users, UserPlus, Calendar, TrendingUp, Target, Clock, Activity, User, Star, Briefcase, Zap, AlertCircle, CheckCircle, Table, Eye } from 'lucide-react';
-import axios from 'axios';
+import api from '../config/axios';
 
 const ResourcePlanning = () => {
   const [projects, setProjects] = useState([]);
@@ -14,7 +14,7 @@ const ResourcePlanning = () => {
 
   const fetchProjects = async () => {
     try {
-      const response = await axios.get('/api/projects');
+      const response = await api.get('/api/projects');
       setProjects(response.data);
     } catch (error) {
       console.error('Failed to fetch project data:', error);
