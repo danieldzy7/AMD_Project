@@ -48,7 +48,7 @@ const Dashboard = () => {
   const clearAllData = async () => {
     if (window.confirm('Are you sure you want to remove all projects from the database? This action cannot be undone.')) {
       try {
-        await axios.delete('/api/projects/clear-all');
+        await api.delete('/api/projects/clear-all');
         alert('All projects have been removed from the database');
         fetchDashboardStats(); // Refresh the dashboard
       } catch (error) {
