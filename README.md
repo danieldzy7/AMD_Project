@@ -1,8 +1,12 @@
-# Dashboard
+# AMD Project Portfolio Management Dashboard
 
-AMD Project Portfolio Management (PPM) Dashboard is a modern web application built on the MERN stack for managing and monitoring AMD's R&D projects.
+A modern web application built on the MERN stack for managing and monitoring AMD's R&D projects with advanced analytics and resource planning capabilities.
 
-## Quick Start
+## 🌐 Live Demo
+
+**Access the application**: [https://amd-project-client.onrender.com/](https://amd-project-client.onrender.com/)
+
+## 🚀 Quick Start
 
 1. **Clone the repository**
    ```bash
@@ -23,10 +27,12 @@ AMD Project Portfolio Management (PPM) Dashboard is a modern web application bui
 4. **Open your browser**
    Navigate to `http://localhost:3000`
 
-## Features
+## ✨ Features
 
-- **Project Management**: Full CRUD operations for R&D projects
-- **Data Visualization**: AG Grid tables and AG Charts for analytics
-- **Resource Planning**: Team member allocation and capacity management
-- **Timeline Views**: Multiple timeline and Gantt chart visualizations
-- **Tax Credit Calculator**: R&D tax credit eligibility calculations 
+- **📊 Project Management**: Full CRUD operations for R&D projects with AG Grid
+- **📈 Data Visualization**: Interactive charts and analytics with AG Charts
+- **👥 Resource Planning**: Team member allocation and capacity management
+- **⏰ Timeline Views**: Multiple timeline and Gantt chart visualizations
+- **💰 Tax Credit Calculator**: R&D tax credit eligibility calculations
+- **🔄 Real-time Updates**: Live data synchronization with MongoDB
+- **📱 Responsive Design**: Works seamlessly on desktop and mobile devices 
