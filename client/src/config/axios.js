@@ -9,6 +9,10 @@ const api = axios.create({
   },
 });
 
+// Debug: Log the API URL being used
+console.log('🔧 API Base URL:', process.env.REACT_APP_API_URL || 'http://localhost:5000');
+console.log('🔧 Environment:', process.env.NODE_ENV);
+
 // Request interceptor
 api.interceptors.request.use(
   (config) => {
