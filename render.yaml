@@ -16,9 +16,8 @@ services:
     healthCheckPath: /api/projects
 
   # Frontend React App
-  - type: web
+  - type: static
     name: amd-ppm-frontend
-    env: static
     plan: starter
     buildCommand: cd client && npm install && npm run build
     staticPublishPath: ./client/build
