@@ -1,15 +1,21 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { AgGridReact } from 'ag-grid-react';
 import { Plus, Edit, Trash2, Download, Filter, X } from 'lucide-react';
-import api from '../config/axios';
+import { useProjects } from '../context/ProjectContext';
 import { format } from 'date-fns';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 
 const ProjectTable = () => {
-  const [projects, setProjects] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { 
+    projects, 
+    loading, 
+    error, 
+    addProject, 
+    deleteProject 
+  } = useProjects();
+  
   const [selectedRows, setSelectedRows] = useState([]);
   const [showNewProjectModal, setShowNewProjectModal] = useState(false);
   const [newProject, setNewProject] = useState({
@@ -30,26 +36,10 @@ const ProjectTable = () => {
     taxCreditEligible: 0
   });
 
-  useEffect(() => {
-    fetchProjects();
-  }, []);
-
-  const fetchProjects = async () => {
-    try {
-      const response = await api.get('/api/projects');
-      setProjects(response.data);
-    } catch (error) {
-      console.error('Failed to fetch project data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleDelete = async (projectId) => {
     if (window.confirm('Are you sure you want to delete this project?')) {
       try {
-        await api.delete(`/api/projects/${projectId}`);
-        fetchProjects();
+        await deleteProject(projectId);
       } catch (error) {
         console.error('Failed to delete project:', error);
       }
@@ -67,7 +57,7 @@ const ProjectTable = () => {
         taxCreditEligible: Math.round(taxCreditEligible)
       };
       
-      await api.post('/api/projects', projectData);
+      await addProject(projectData);
       setShowNewProjectModal(false);
       setNewProject({
         projectId: '',
@@ -86,7 +76,6 @@ const ProjectTable = () => {
         forecastSpend: 0,
         taxCreditEligible: 0
       });
-      fetchProjects();
     } catch (error) {
       console.error('Failed to create project:', error);
       alert('Failed to create project. Please try again.');
@@ -321,6 +310,18 @@ const ProjectTable = () => {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amd-blue"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <X className="h-12 w-12 text-red-500 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">Error Loading Projects</h3>
+          <p className="text-gray-600">{error}</p>
+        </div>
       </div>
     );
   }

@@ -17,7 +17,7 @@ code {
     monospace;
 }
 
-/* AG Grid 自定义样式 */
+/* AG Grid Custom Styles */
 .ag-theme-alpine {
   --ag-header-height: 50px;
   --ag-header-foreground-color: #374151;
@@ -29,7 +29,7 @@ code {
   --ag-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-/* 自定义滚动条 */
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -48,7 +48,7 @@ code {
   background: #94a3b8;
 }
 
-/* 卡片阴影效果 */
+/* Card Shadow Effects */
 .card-shadow {
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
 }
@@ -57,12 +57,12 @@ code {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
-/* 渐变背景 */
+/* Gradient Background */
 .gradient-bg {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
-/* 动画效果 */
+/* Animation Effects */
 @keyframes fadeIn {
   from {
     opacity: 0;

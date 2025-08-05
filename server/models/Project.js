@@ -77,19 +77,16 @@ const projectSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// 虚拟字段：项目持续时间（天数）
 projectSchema.virtual('duration').get(function() {
   return Math.ceil((this.endDate - this.startDate) / (1000 * 60 * 60 * 24));
 });
 
-// 虚拟字段：完成百分比
 projectSchema.virtual('completionPercentage').get(function() {
   const total = this.endDate - this.startDate;
   const elapsed = Date.now() - this.startDate;
   return Math.min(Math.max((elapsed / total) * 100, 0), 100);
 });
 
-// 确保虚拟字段在JSON序列化时包含
 projectSchema.set('toJSON', { virtuals: true });
 projectSchema.set('toObject', { virtuals: true });
 

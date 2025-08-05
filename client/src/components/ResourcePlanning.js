@@ -1,27 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Users, UserPlus, Calendar, TrendingUp, Target, Clock, Activity, User, Star, Briefcase, Zap, AlertCircle, CheckCircle, Table, Eye } from 'lucide-react';
-import api from '../config/axios';
+import { useProjects } from '../context/ProjectContext';
 
 const ResourcePlanning = () => {
-  const [projects, setProjects] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { projects, loading, error } = useProjects();
   const [selectedMember, setSelectedMember] = useState(null);
   const [viewMode, setViewMode] = useState('table'); // table, compact, details
-
-  useEffect(() => {
-    fetchProjects();
-  }, []);
-
-  const fetchProjects = async () => {
-    try {
-      const response = await api.get('/api/projects');
-      setProjects(response.data);
-    } catch (error) {
-      console.error('Failed to fetch project data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // Mock team members data with different capacities and skills
   const teamMembers = [
@@ -301,6 +285,18 @@ const ResourcePlanning = () => {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amd-blue"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">Error Loading Resources</h3>
+          <p className="text-gray-600">{error}</p>
+        </div>
       </div>
     );
   }

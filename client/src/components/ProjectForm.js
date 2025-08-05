@@ -2,14 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { Save, ArrowLeft, Plus } from 'lucide-react';
-import api from '../config/axios';
+import { useProjects } from '../context/ProjectContext';
 
 const ProjectForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [project, setProject] = useState(null);
+  const { 
+    getProjectById, 
+    addProject, 
+    updateProject 
+  } = useProjects();
+  
   const isEditing = Boolean(id);
+  const project = isEditing ? getProjectById(id) : null;
 
   const {
     register,
@@ -38,22 +44,6 @@ const ProjectForm = () => {
     }
   }, [project, setValue]);
 
-  useEffect(() => {
-    if (isEditing && id) {
-      fetchProject();
-    }
-  }, [isEditing, id]);
-
-  const fetchProject = async () => {
-    try {
-      const response = await api.get(`/api/projects/${id}`);
-      const projectData = response.data;
-      setProject(projectData);
-    } catch (error) {
-      console.error('Failed to fetch project data:', error);
-    }
-  };
-
   const onSubmit = async (data) => {
     setLoading(true);
     try {
@@ -67,9 +57,9 @@ const ProjectForm = () => {
       };
 
       if (isEditing) {
-        await api.put(`/api/projects/${id}`, projectData);
+        await updateProject(id, projectData);
       } else {
-        await api.post('/api/projects', projectData);
+        await addProject(projectData);
       }
       
       navigate('/projects');

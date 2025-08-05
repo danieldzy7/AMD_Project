@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   FolderOpen, 
@@ -13,44 +13,30 @@ import {
   Target,
   BarChart3
 } from 'lucide-react';
-import api from '../config/axios';
+import { useProjects } from '../context/ProjectContext';
 import { AgCharts } from 'ag-charts-react';
 
 const Dashboard = () => {
-  const [stats, setStats] = useState({
-    totalProjects: 0,
-    activeProjects: 0,
-    totalBudget: 0,
-    totalActualSpend: 0,
-    avgRDPercentage: 0
-  });
-  const [loading, setLoading] = useState(true);
+  const { 
+    stats, 
+    loading, 
+    error, 
+    lastUpdated,
+    clearAllProjects, 
+    seedSampleData,
+    getMostExpensiveProject 
+  } = useProjects();
+  
   const [selectedWorkloadMonth, setSelectedWorkloadMonth] = useState(null);
   const [selectedProjectStage, setSelectedProjectStage] = useState(null);
   const [showWorkloadDetails, setShowWorkloadDetails] = useState(false);
   const [showProjectDetails, setShowProjectDetails] = useState(false);
 
-  useEffect(() => {
-    fetchDashboardStats();
-  }, []);
-
-  const fetchDashboardStats = async () => {
-    try {
-      const response = await api.get('/api/projects/stats/dashboard');
-      setStats(response.data);
-    } catch (error) {
-      console.error('Failed to fetch dashboard data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const clearAllData = async () => {
+  const handleClearAllData = async () => {
     if (window.confirm('Are you sure you want to remove all projects from the database? This action cannot be undone.')) {
       try {
-        await api.delete('/api/projects/clear-all');
+        await clearAllProjects();
         alert('All projects have been removed from the database');
-        fetchDashboardStats(); // Refresh the dashboard
       } catch (error) {
         console.error('Failed to clear data:', error);
         alert('Failed to clear data from database');
@@ -58,12 +44,11 @@ const Dashboard = () => {
     }
   };
 
-  const seedSampleData = async () => {
+  const handleSeedSampleData = async () => {
     if (window.confirm('Add 50 sample AMD projects to the database?')) {
       try {
-        await api.post('/api/projects/seed');
+        await seedSampleData();
         alert('Sample data has been added successfully');
-        fetchDashboardStats(); // Refresh the dashboard
       } catch (error) {
         console.error('Failed to seed data:', error);
         alert('Failed to add sample data to database');
@@ -80,30 +65,33 @@ const Dashboard = () => {
     }).format(amount);
   };
 
+  // Get most expensive project
+  const mostExpensiveProject = getMostExpensiveProject();
+
   // Calculate additional metrics
-  const completedProjects = Math.floor(stats.totalProjects * 0.14); // 14% completed
-  const planningProjects = Math.floor(stats.totalProjects * 0.06); // 6% planning
-  const totalFTEs = stats.totalProjects * 3.2; // Average 3.2 FTEs per project
+  const completedProjects = Math.floor((stats.totalProjects || 0) * 0.14); // 14% completed
+  const planningProjects = Math.floor((stats.totalProjects || 0) * 0.06); // 6% planning
+  const totalFTEs = (stats.totalProjects || 0) * 3.2; // Average 3.2 FTEs per project
   const avgMonthlyFTEs = totalFTEs / 12;
   const peakLoad = avgMonthlyFTEs * 1.64; // Peak load calculation
 
   // Calculate workload analysis metrics
   const peakMonth = 'Sep'; // Based on the workload data
-  const avgVariance = Math.round(((avgMonthlyFTEs * 1.6 - avgMonthlyFTEs * 0.8) / avgMonthlyFTEs) * 100);
-  const utilizationRate = Math.round((stats.activeProjects / stats.totalProjects) * 100);
+  const avgVariance = Math.round(((avgMonthlyFTEs * 1.6 - avgMonthlyFTEs * 0.8) / (avgMonthlyFTEs || 1)) * 100);
+  const utilizationRate = stats.totalProjects > 0 ? Math.round((stats.activeProjects / stats.totalProjects) * 100) : 0;
 
   // Calculate project stage analysis metrics
   const mostActiveStage = 'In Progress';
-  const completionRate = Math.round((completedProjects / stats.totalProjects) * 100);
+  const completionRate = stats.totalProjects > 0 ? Math.round((completedProjects / stats.totalProjects) * 100) : 0;
   const avgDuration = Math.round(365 / 12); // Average project duration in days
-  const totalAllocatedFTEs = Math.round(stats.activeProjects * 3.2);
+  const totalAllocatedFTEs = Math.round((stats.activeProjects || 0) * 3.2);
 
   // Generate project stage distribution data
   const stageDistributionData = [
-    { stage: 'In Progress', count: Math.floor(stats.totalProjects * 0.45) },
-    { stage: 'Design', count: Math.floor(stats.totalProjects * 0.25) },
-    { stage: 'Validation', count: Math.floor(stats.totalProjects * 0.15) },
-    { stage: 'R&D Prototype', count: Math.floor(stats.totalProjects * 0.10) },
+    { stage: 'In Progress', count: Math.floor((stats.totalProjects || 0) * 0.45) },
+    { stage: 'Design', count: Math.floor((stats.totalProjects || 0) * 0.25) },
+    { stage: 'Validation', count: Math.floor((stats.totalProjects || 0) * 0.15) },
+    { stage: 'R&D Prototype', count: Math.floor((stats.totalProjects || 0) * 0.10) },
     { stage: 'Completed', count: completedProjects },
     { stage: 'Planning', count: planningProjects }
   ];
@@ -140,11 +128,12 @@ const Dashboard = () => {
           enabled: true,
           renderer: (params) => {
             if (!params.datum) return { content: 'No data' };
+            const percentage = stats.totalProjects > 0 ? ((params.datum.count / stats.totalProjects) * 100).toFixed(1) : '0.0';
             return {
               content: `<div class="bg-white p-3 rounded-lg shadow-lg border">
                 <div class="font-semibold text-gray-900">${params.datum.stage}</div>
                 <div class="text-blue-600">Projects: ${params.datum.count}</div>
-                <div class="text-gray-600">${((params.datum.count / stats.totalProjects) * 100).toFixed(1)}% of total</div>
+                <div class="text-gray-600">${percentage}% of total</div>
               </div>`
             };
           }
@@ -228,6 +217,18 @@ const Dashboard = () => {
     );
   }
 
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">Error Loading Data</h3>
+          <p className="text-gray-600">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Page Title */}
@@ -235,6 +236,11 @@ const Dashboard = () => {
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Project Analytics & Insights</h1>
           <p className="text-gray-600 mt-2">AMD Project Portfolio Management Real-time Data</p>
+          {lastUpdated && (
+            <p className="text-xs text-gray-400 mt-1">
+              Last updated: {new Date(lastUpdated).toLocaleString()}
+            </p>
+          )}
         </div>
         <Link
           to="/projects/new"
@@ -244,6 +250,20 @@ const Dashboard = () => {
           <span>New Project</span>
         </Link>
       </div>
+
+      {/* Most Expensive Project Alert */}
+      {mostExpensiveProject && (
+        <div className="bg-gradient-to-r from-yellow-400 to-orange-500 p-4 rounded-lg text-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-semibold">Most Expensive Project</h3>
+              <p className="text-sm opacity-90">{mostExpensiveProject.name}</p>
+              <p className="text-lg font-bold">{formatCurrency(mostExpensiveProject.budget)}</p>
+            </div>
+            <DollarSign className="h-8 w-8 opacity-80" />
+          </div>
+        </div>
+      )}
 
       {/* Project Status Distribution Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -392,9 +412,9 @@ const Dashboard = () => {
            {/* Interactive Project Status Details */}
            <div className="mt-4 space-y-2">
              {[
-               { stage: 'In Progress', count: Math.floor(stats.totalProjects * 0.45), color: 'bg-purple-100 text-purple-800', icon: '⚡' },
-               { stage: 'Design', count: Math.floor(stats.totalProjects * 0.25), color: 'bg-blue-100 text-blue-800', icon: '📐' },
-               { stage: 'Validation', count: Math.floor(stats.totalProjects * 0.15), color: 'bg-yellow-100 text-yellow-800', icon: '🔍' },
+               { stage: 'In Progress', count: Math.floor((stats.totalProjects || 0) * 0.45), color: 'bg-purple-100 text-purple-800', icon: '⚡' },
+               { stage: 'Design', count: Math.floor((stats.totalProjects || 0) * 0.25), color: 'bg-blue-100 text-blue-800', icon: '📐' },
+               { stage: 'Validation', count: Math.floor((stats.totalProjects || 0) * 0.15), color: 'bg-yellow-100 text-yellow-800', icon: '🔍' },
                { stage: 'Completed', count: completedProjects, color: 'bg-green-100 text-green-800', icon: '✓' }
              ].map((item, index) => (
                <div 
@@ -479,10 +499,10 @@ const Dashboard = () => {
             <div>
               <div className="flex justify-between items-center mb-2">
                 <span className="text-sm font-medium text-gray-700">Average R&D Eligibility</span>
-                <span className="text-sm font-bold text-gray-900">{stats.avgRDPercentage.toFixed(0)}%</span>
+                <span className="text-sm font-bold text-gray-900">{(stats.avgRDPercentage || 0).toFixed(0)}%</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-green-500 h-2 rounded-full" style={{ width: `${stats.avgRDPercentage}%` }}></div>
+                <div className="bg-green-500 h-2 rounded-full" style={{ width: `${stats.avgRDPercentage || 0}%` }}></div>
               </div>
             </div>
           </div>
@@ -491,11 +511,11 @@ const Dashboard = () => {
           <div className="mt-6 pt-6 border-t border-gray-200">
             <div className="grid grid-cols-2 gap-4">
               <div className="text-center">
-                <p className="text-2xl font-bold text-gray-900">{formatCurrency(stats.totalBudget)}</p>
+                <p className="text-2xl font-bold text-gray-900">{formatCurrency(stats.totalBudget || 0)}</p>
                 <p className="text-sm text-gray-500">Total Budget</p>
               </div>
               <div className="text-center">
-                <p className="text-2xl font-bold text-gray-900">{formatCurrency(stats.totalActualSpend)}</p>
+                <p className="text-2xl font-bold text-gray-900">{formatCurrency(stats.totalActualSpend || 0)}</p>
                 <p className="text-sm text-gray-500">Actual Spend</p>
               </div>
             </div>
@@ -540,7 +560,7 @@ const Dashboard = () => {
           </button>
 
           <button 
-            onClick={clearAllData}
+            onClick={handleClearAllData}
             className="flex items-center space-x-3 p-4 border border-red-200 rounded-lg hover:bg-red-50 transition-colors"
           >
             <AlertCircle className="h-6 w-6 text-red-600" />
@@ -551,7 +571,7 @@ const Dashboard = () => {
           </button>
 
           <button 
-            onClick={seedSampleData}
+            onClick={handleSeedSampleData}
             className="flex items-center space-x-3 p-4 border border-green-200 rounded-lg hover:bg-green-50 transition-colors"
           >
             <Plus className="h-6 w-6 text-green-600" />

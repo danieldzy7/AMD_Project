@@ -1,29 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Calendar, Clock, CheckCircle, AlertCircle, Play, Pause, BarChart3, TrendingUp, Activity, Target, ChevronLeft, ChevronRight } from 'lucide-react';
-import api from '../config/axios';
+import { useProjects } from '../context/ProjectContext';
 import { format, addDays, differenceInDays, startOfMonth, endOfMonth } from 'date-fns';
 
 const Timeline = () => {
-  const [projects, setProjects] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { projects, loading, error } = useProjects();
   const [currentPage, setCurrentPage] = useState(1);
   const projectsPerPage = 5;
   const [viewMode, setViewMode] = useState('gantt'); // gantt, calendar, list, timeline
-
-  useEffect(() => {
-    fetchProjects();
-  }, []);
-
-  const fetchProjects = async () => {
-    try {
-      const response = await api.get('/api/projects');
-      setProjects(response.data);
-    } catch (error) {
-      console.error('Failed to fetch project data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // Pagination logic
   const totalPages = Math.ceil(projects.length / projectsPerPage);
@@ -81,7 +65,7 @@ const Timeline = () => {
   const activeProjects = projects.filter(p => p.stage === 'In Progress').length;
   const completedProjects = projects.filter(p => p.stage === 'Completed').length;
   const upcomingProjects = projects.filter(p => new Date(p.startDate) > new Date()).length;
-  const avgProgress = projects.reduce((sum, p) => sum + calculateProgress(p.startDate, p.endDate), 0) / totalProjects;
+  const avgProgress = projects.length > 0 ? projects.reduce((sum, p) => sum + calculateProgress(p.startDate, p.endDate), 0) / totalProjects : 0;
 
   // Group current projects by stage for Gantt chart
   const groupedProjects = currentProjects.reduce((acc, project) => {
@@ -95,8 +79,8 @@ const Timeline = () => {
 
   // Calculate timeline bounds for current projects
   const allDates = currentProjects.flatMap(p => [new Date(p.startDate), new Date(p.endDate)]);
-  const minDate = new Date(Math.min(...allDates));
-  const maxDate = new Date(Math.max(...allDates));
+  const minDate = allDates.length > 0 ? new Date(Math.min(...allDates)) : new Date();
+  const maxDate = allDates.length > 0 ? new Date(Math.max(...allDates)) : new Date();
   const timelineStart = startOfMonth(minDate);
   const timelineEnd = endOfMonth(maxDate);
   const totalDays = differenceInDays(timelineEnd, timelineStart) + 1;
@@ -123,6 +107,18 @@ const Timeline = () => {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amd-blue"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">Error Loading Timeline</h3>
+          <p className="text-gray-600">{error}</p>
+        </div>
       </div>
     );
   }
